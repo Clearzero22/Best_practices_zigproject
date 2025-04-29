@@ -4,6 +4,37 @@
 const webui = @import("webui");
 const html = @embedFile("index.html");
 
+pub fn webserver() !void {
+    const address = try std.net.Address.parseIp4("0.0.0.0", 8080);
+    var server = try std.net.StreamServer.init(.{});
+    defer server.deinit();
+    try server.listen(address);
+
+    std.debug.print("Listening on http://0.0.0.0:8080\n", .{});
+
+    while (true) {
+        var connection = try server.accept();
+        defer connection.stream.close();
+
+        var buffer: [1024]u8 = undefined;
+        const size = try connection.stream.read(&buffer);
+        const request = buffer[0..size];
+
+        std.debug.print("Received request:\n{s}\n", .{request});
+
+        const response =
+            \\HTTP/1.1 200 OK\r\n
+            \\Content-Type: text/html; charset=UTF-8\r\n
+            \\Connection: close\r\n
+            \\Content-Length: 48\r\n
+            \\r\n
+            \\<html><body><h1>Hello from Zig Server!</h1></body></html>
+        ;
+
+        _ = try connection.stream.write(response);
+    }
+}
+
 pub fn main() !void {
     // Prints to stderr (it's a shortcut based on `std.io.getStdErr()`)
     // std.debug.print("All your {s} are belong to us.\n", .{"codebase"});
