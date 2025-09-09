@@ -59,7 +59,7 @@
     // Tracks the earliest Zig version that the package considers to be a
     // supported use case.
     // ：记录了这个软件包认为最早的、可以支持正常使用的 Zig 版本。
-    .minimum_zig_version = "0.14.0",
+    .minimum_zig_version = "0.15.1",
 
     // This field is optional.
     // Each dependency must either provide a `url` and `hash`, or a `path`.

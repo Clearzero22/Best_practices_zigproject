@@ -2,9 +2,12 @@
 //! you are building an executable. If you are making a library, the convention
 //! is to delete this file and start with root.zig instead.
 const webui = @import("webui");
+
+// 嵌入html文件
 const html = @embedFile("index.html");
 
 pub fn webserver() !void {
+    // 初始化本地地址
     const address = try std.net.Address.parseIp4("0.0.0.0", 8080);
     var server = try std.net.StreamServer.init(.{});
     defer server.deinit();
@@ -21,7 +24,7 @@ pub fn webserver() !void {
         const request = buffer[0..size];
 
         std.debug.print("Received request:\n{s}\n", .{request});
-
+        // 返回字符串响应
         const response =
             \\HTTP/1.1 200 OK\r\n
             \\Content-Type: text/html; charset=UTF-8\r\n
@@ -36,25 +39,11 @@ pub fn webserver() !void {
 }
 
 pub fn main() !void {
-    // Prints to stderr (it's a shortcut based on `std.io.getStdErr()`)
-    // std.debug.print("All your {s} are belong to us.\n", .{"codebase"});
-
-    // // stdout is for the actual output of your application, for example if you
-    // // are implementing gzip, then only the compressed bytes should be sent to
-    // // stdout, not any debugging messages.
-    // const stdout_file = std.io.getStdOut().writer();
-    // var bw = std.io.bufferedWriter(stdout_file);
-    // const stdout = bw.writer();
-
-    // try stdout.print("Run `zig build test` to run the tests.\n", .{});
-
-    // try bw.flush(); // Don't forget to flush!
-
-    // Create Windows
-
+    // 创建一个新的窗口
     var nwin = webui.newWindow();
 
     // Bind HTML elements with C functions
+    // 绑定 C function
     _ = try nwin.bind("my_function_count", my_function_count);
     _ = try nwin.bind("my_function_exit", my_function_exit);
 
@@ -113,28 +102,6 @@ fn my_function_exit(_: *webui.Event) void {
     // Close all opened windows
     webui.exit();
 }
-
-// test "simple test" {
-//     var list = std.ArrayList(i32).init(std.testing.allocator);
-//     defer list.deinit(); // Try commenting this out and see if zig detects the memory leak!
-//     try list.append(42);
-//     try std.testing.expectEqual(@as(i32, 42), list.pop());
-// }
-
-// test "use other module" {
-//     try std.testing.expectEqual(@as(i32, 150), lib.add(100, 50));
-// }
-
-// test "fuzz example" {
-//     const Context = struct {
-//         fn testOne(context: @This(), input: []const u8) anyerror!void {
-//             _ = context;
-//             // Try passing `--fuzz` to `zig build test` and see if it manages to fail this test case!
-//             try std.testing.expect(!std.mem.eql(u8, "canyoufindme", input));
-//         }
-//     };
-//     try std.testing.fuzz(Context{}, Context.testOne, .{});
-// }
 
 const std = @import("std");
 
